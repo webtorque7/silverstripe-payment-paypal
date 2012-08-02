@@ -13,18 +13,19 @@ class PayPalExpressGateway extends PayPalGateway {
 
   public function process($data) {
     parent::process($data);
-    
+
     $this->postData['METHOD'] = 'SetExpressCheckout';
     // Add return and cancel urls
     $this->postData['RETURNURL'] = $this->returnURL;
     $this->postData['CANCELURL'] = $this->cancelURL;
-    
-    $this->setExpressCheckout($this->data);
+
+    $this->setExpressCheckout($this->postData);
+
     if ($this->token) {
       // If Authorization successful, redirect to PayPal to complete the payment
-      Controller::curr()->redirect(self::get_paypal_redirect_url() . "?cmd=_express-checkout&token=$token");
+      Controller::curr()->redirect(self::get_paypal_redirect_url() . "?cmd=_express-checkout&token=" . $this->token);
     } else {
-      // Otherwise, do something...
+      //TODO need to figure out what to do here instead of just displaying a blank white screen
     }
   }
   

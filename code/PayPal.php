@@ -130,7 +130,8 @@ class PayPalGateway extends PaymentGateway {
   public function parseResponse($response) {
     if ($response instanceof RestfulService_Response) {
       parse_str($response->getBody(), $responseArr);
-    } else {
+    } 
+    else {
       parse_str($response, $responseArr);
     }
     

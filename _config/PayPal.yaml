@@ -9,7 +9,7 @@ PaymentFactory:
       live: PayPalDirectGateway
       dev: PayPalDirectGateway
     model: 'PayPal'
-      
+
   PayPalExpress:
     title: 'PayPal Express Checkout'
     controller: 'PaymentProcessor_GatewayHosted'
