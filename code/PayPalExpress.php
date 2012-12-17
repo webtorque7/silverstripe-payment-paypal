@@ -19,32 +19,42 @@ class PayPalExpressGateway extends PayPalGateway {
     $this->postData['RETURNURL'] = $this->returnURL;
     $this->postData['CANCELURL'] = $this->cancelURL;
 
-    $this->setExpressCheckout($this->postData);
-
-    if ($this->token) {
-      // If Authorization successful, redirect to PayPal to complete the payment
-      Controller::curr()->redirect(self::get_paypal_redirect_url() . "?cmd=_express-checkout&token=" . $this->token);
+    $response = $this->postPaymentData($data);
+    if ($response->getStatusCode() != '200') {
+      return PaymentGateway_Failure($response);
     } else {
-      //TODO need to figure out what to do here instead of just displaying a blank white screen
+      if ($token = $this->getToken($response)) {
+        // If Authorization successful, redirect to PayPal to complete the payment
+        Controller::curr()->redirect(self::get_paypal_redirect_url() . "?cmd=_express-checkout&token=$token");
+      } else {
+        // Otherwise, return failure message
+        $errorList = $this->getErrors($response);
+        return new PaymentGateway_Failure(null, null, $errorList);
+      }
     }
   }
-  
+
   /**
-   * Send a request to PayPal to authorize an express checkout transaction
+   * Get the token value from a valid HTTP response
+   *
+   * @param SS_HTTPResponse $response
+   * @return String|null
    */
-  public function setExpressCheckout($data) {
-    // Post the data to PayPal server to get the token
-    $response = $this->parseResponse($this->postPaymentData($data));
-    
-    if (isset($response['TOKEN'])) {
-      $token = $response['TOKEN'];
+  public function getToken($response) {
+    $responseArr = $this->parseResponse($response);
+
+    if (isset($responseArr['TOKEN'])) {
+      $token = $responseArr['TOKEN'];
       $this->token = $token;
       return $token;
     }
-    
+
     return null;
   }
 
+  /**
+   * @see PaymentGateway_GatewayHosted
+   */
   public function getResponse($response) {
     // Get the payer information
     $this->preparePayPalPost();
@@ -69,12 +79,51 @@ class PayPalExpressGateway extends PayPalGateway {
           return new PaymentGateway_Result();
           break;
         case self::FAILURE_CODE:
-          return new PaymentGateway_Result(false);
+          $errorList = $this->getErrors($response);
+          return new PaymentGateway_Failure(null, null, $errorList);
           break;
         default:
-          return new PaymentGateway_Result(false);
+          return new PaymentGateway_Failure();
           break;
       }
     }
+  }
+}
+
+/**
+ * Gateway class to mock up PayPalExpress for testing purpose
+ */
+class PayPalExpressGateway_Mock extends PayPalExpressGateway {
+
+  /* Response template strings */
+  private $tokenResponseTemplate = 'TIMESTAMP=&CORRELATIONID=&TOKEN=&VERSION=BUILD=';
+  private $failureResponseTemplate = 'ACK=Failure&L_ERRORCODE0=&L_SHORTMESSAGE0=&L_LONGMESSAGE0=';
+
+  /**
+   * Generate a mock token response based on the template
+   */
+  public function generateDummyTokenResponse() {
+    $tokenResponseArr = $this->parseResponse($this->tokenResponseTemplate);
+
+    $tokenResponseArr['TIMESTAMP'] = time();
+    $tokenResponseArr['CORRELATIONID'] = 'cfcb59afaabb4';
+    $tokenResponseArr['TOKEN'] = '2d6TB68159J8219744P';
+    $tokenResponseArr['VERSION'] = self::PAYPAL_VERSION;
+    $tokenResponseArr['BUILD'] = '1195961';
+
+    return http_build_query($tokenResponseArr);
+  }
+
+  /**
+   * Generate a mock failure response based on the template
+   */
+  public function generateDummyFailureResponse() {
+    $failureResponseArr = $this->parseResponse($this->failureResponseTemplate);
+
+    $failureResponseArr['L_ERRORCODE0'] = '81002';
+    $failureResponseArr['L_SHORTMESSAGE0'] = 'Undefined Method';
+    $failureResponseArr['L_LONGMESSAGE0'] = 'Method specified is not supported';
+
+    return http_build_query($failureResponseArr);
   }
 }

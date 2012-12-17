@@ -1,50 +1,40 @@
-SilverStripe Payment PayPal Module
-==================================
+# PayPal Payment
 
-Maintainer Contacts
--------------------
+## Maintainer Contacts
+---------------------
 *  Ryan Dao
+*  Frank Mullenger
+*  Jeremy Shipman
 
-Requirements
-------------
+## Requirements
+---------------------
 * SilverStripe 3.0
+* SilverStripe Payment
 
-Documentation
--------------
+## Documentation
+---------------------
+### Usage Overview
 
-Installation Instructions
--------------------------
-1. Place this directory in the root of your SilverStripe installation and call it 'payment-paypal'.
-2. Visit yoursite.com/dev/build to rebuild the database.
-3. Enable supported payment methods in your application yaml file
+This module provides PayPal payment support for the SilverStripe Payment module. 
 
-e.g: mysite/_config/Mysite.yaml
-PaymentGateway:
-  environment:
-    'dev'
-PaymentProcessor:
-  supported_methods:
-    dev:
-      - 'PayPalDirect'
-      - 'PayPalExpress'
-    live:
-      - 'PayPalDirect'
-      - 'PayPalExpress'
+### Installation guide
+  Add to mysite/_config:
+    
+    PayPalGateway: 
+      dev: // to be added only if Sandbox is used
+        url: 
+          'https://api-3t.sandbox.paypal.com/nvp'
+        authentication:
+          username:
+          password:
+          signature: 
+      live:
+        url: 
+          'https://api-3t.paypal.com/nvp'
+        authentication:
+          username:
+          password:
+          signature: 
 
-4. Configure the Paypal gateways
-
-e.g: mysite/_config/Mysite.yaml
-PayPalGateway: 
-  dev: 
-    authentication:
-      username:
-      password:
-      signature: 
-  live:
-    authentication:
-      username:
-      password:
-      signature: 
-
-Usage Overview
---------------
+To get PayPal Sandbox test accounts, follow the [PayPal documentation](https://cms.paypal.com/cms_content/US/en_US/files/developer/PP_Sandbox_UserGuide.pdf). 
+**Note: If you have "Bad request" problem with PayPal, try to empty the browser cache and cookies.
