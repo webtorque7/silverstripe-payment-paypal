@@ -3,6 +3,33 @@
  * Default class for the common API of PayPal Payment pro
  */
 class PayPalGateway extends PaymentGateway_GatewayHosted {
+
+	protected $supportedCurrencies = array(
+    'NZD' => 'New Zealand Dollar',
+    'USD' => 'United States Dollar',
+    'GBP' => 'Great British Pound',
+    'AUD' => 'Australian Dollar',
+    'CAD' => 'Canadian Dollar',
+    'CZK' => 'Czech Koruna',
+    'DKK' => 'Danish Krone',
+    'EUR' => 'Euro',
+    'HKD' => 'Hong Kong Dollar',
+    'HUF' => 'Hungarian Forint',
+    'JPY' => 'Japanese Yen',
+    'NOK' => 'Norwegian Krone',
+    'PLN' => 'Polish Zloty',
+    'SGD' => 'Singapore Dollar',
+    'SEK' => 'Swedish Krona',
+    'CHF' => 'Swiss Franc',
+  );
+
+	/**
+   * The gateway url
+   *
+   * @var String
+   */
+  public $gatewayURL;
+
   /* PayPal constants */
   const SUCCESS_CODE = 'Success';
   const SUCCESS_WARNING = 'SuccessWithWarning';
@@ -70,14 +97,6 @@ class PayPalGateway extends PaymentGateway_GatewayHosted {
 
   public function __construct() {
     $this->gatewayURL = self::get_url();
-  }
-
-  /**
-   * @see PaymentGateway::getSupportedCurrencies()
-   */
-  public function getSupportedCurrencies() {
-    return array('AUD', 'CAD', 'CZK', 'DKK', 'EUR', 'HKD', 'HUF', 'JPY',
-                 'NOK', 'NZD', 'PLN', 'GBP', 'SGD', 'SEK', 'CHF', 'USD');
   }
 
   /**
@@ -174,8 +193,23 @@ class PayPalGateway extends PaymentGateway_GatewayHosted {
    *
    * @see PaymentGateway::postPaymentData()
    */
+  // public function postPaymentData($data, $endpoint = null) {
+  //   $httpQuery = http_build_query($data);
+  //   return parent::postPaymentData($httpQuery);
+  // }
+
   public function postPaymentData($data, $endpoint = null) {
-    $httpQuery = http_build_query($data);
-    return parent::postPaymentData($httpQuery);
+
+    if (!$endpoint) {
+      $endpoint = $this->gatewayURL;
+    }
+
+    $data = http_build_query($data);
+
+    SS_Log::log(new Exception(print_r($endpoint, true)), SS_Log::NOTICE);
+    SS_Log::log(new Exception(print_r($data, true)), SS_Log::NOTICE);
+
+    $service = new RestfulService($endpoint);
+    return $service->request(null, 'POST', $data);
   }
 }

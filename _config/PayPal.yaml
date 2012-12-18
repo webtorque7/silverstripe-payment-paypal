@@ -2,28 +2,25 @@ name: PayPal
 ---
 
 PaymentFactory:
-  PayPalDirect:
-    title: 'PayPal Direct Payment'
-    processor: 'PaymentProcessor_MerchantHosted'
-    gateway_classes:
-      live: PayPalDirectGateway
-      dev: PayPalDirectGateway
-      test: PayPalDirectGateway_Mock
-
   PayPalExpress:
     title: 'PayPal Express Checkout'
     processor: 'PaymentProcessor_GatewayHosted'
     gateway_classes:
-      live: PayPalExpressGateway
-      dev: PayPalExpressGateway
-      test: PayPalExpressGateway_Mock
+      live: PayPalGateway_Express
+      dev: PayPalGateway_Express
 
 PayPalGateway:
   live:
     url:
       'https://api-3t.paypal.com/nvp'
+    redirect_url:
+      'https://www.paypal.com/webscr'
   dev:
     url:
       'https://api-3t.sandbox.paypal.com/nvp'
+    redirect_url:
+      'https://www.sandbox.paypal.com/webscr'
   action:
     'Sale'
+  version:
+    '72.0'
