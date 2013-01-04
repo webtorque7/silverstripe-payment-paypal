@@ -71,6 +71,7 @@ class PayPalGateway extends PaymentGateway_GatewayHosted {
 }
 
 class PayPalGateway_Express extends PayPalGateway {
+
   /**
    * The PayPal token for this transaction
    *
@@ -79,8 +80,6 @@ class PayPalGateway_Express extends PayPalGateway {
   private $token = null;
 
   public function process($data) {
-
-    //parent::process($data);
 
     $config = $this->getConfig();
     $authentication = $config['authentication'];
@@ -113,7 +112,7 @@ class PayPalGateway_Express extends PayPalGateway {
 
       if ($token = $this->getToken($response)) {
         // If Authorization successful, redirect to PayPal to complete the payment
-        Controller::curr()->redirect(self::get_paypal_redirect_url() . "?cmd=_express-checkout&token=$token");
+        Controller::curr()->redirect($config['redirect_url'] . "?cmd=_express-checkout&token=$token");
       } 
       else {
         // Otherwise, return failure message
