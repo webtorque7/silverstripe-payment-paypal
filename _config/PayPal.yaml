@@ -4,23 +4,20 @@ name: PayPal
 PaymentFactory:
   PayPalExpress:
     title: 'PayPal Express Checkout'
-    processor: 'PaymentProcessor_GatewayHosted'
+    processor: 'PayPalProcessor_Express'
     gateway_classes:
-      live: PayPalGateway_Express
-      dev: PayPalGateway_Express
+      live: 'PayPalGateway_Express'
+      dev: 'PayPalGateway_Express'
+    model: 'PayPal_Express'
 
-PayPalGateway:
+PayPalGateway_Express:
   live:
-    url:
+    endpoint:
       'https://api-3t.paypal.com/nvp'
-    redirect_url:
-      'https://www.paypal.com/webscr'
-  dev:
     url:
+      'https://www.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token='
+  dev:
+    endpoint:
       'https://api-3t.sandbox.paypal.com/nvp'
-    redirect_url:
-      'https://www.sandbox.paypal.com/webscr'
-  action:
-    'Sale'
-  version:
-    '72.0'
+    url:
+      'https://www.sandbox.paypal.com/webscr?cmd=_express-checkout&token='

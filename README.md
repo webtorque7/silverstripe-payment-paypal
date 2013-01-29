@@ -19,22 +19,19 @@ This module provides PayPal payment support for the SilverStripe Payment module.
 
 ### Installation guide
   Add to mysite/_config:
-    
-    PayPalGateway: 
-      dev: // to be added only if Sandbox is used
-        url: 
-          'https://api-3t.sandbox.paypal.com/nvp'
-        authentication:
-          username:
-          password:
-          signature: 
-      live:
-        url: 
-          'https://api-3t.paypal.com/nvp'
-        authentication:
-          username:
-          password:
-          signature: 
+  
+  	PayPalGateway_Express: 
+		  live:
+		    authentication:
+		      username: ''
+		      password: ''
+		      signature: ''
+		  dev:
+		    authentication:
+		      username: ''
+		      password: ''
+		      signature: ''
 
-To get PayPal Sandbox test accounts, follow the [PayPal documentation](https://cms.paypal.com/cms_content/US/en_US/files/developer/PP_Sandbox_UserGuide.pdf). 
-**Note: If you have "Bad request" problem with PayPal, try to empty the browser cache and cookies.
+To get PayPal Sandbox test accounts, follow the [PayPal documentation](https://cms.paypal.com/cms_content/US/en_US/files/developer/PP_Sandbox_UserGuide.pdf).
+ 
+**Note:** If you have "Bad request" problems with PayPal, try to empty the browser cache and cookies. If you get error 3005 try testing on a different machine/IP address.
