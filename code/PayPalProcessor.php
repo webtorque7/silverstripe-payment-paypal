@@ -7,14 +7,12 @@ class PayPalProcessor_Express extends PaymentProcessor {
 		parent::capture($data);
 		
 		// Set the return link
-		$returnURL = Director::absoluteURL(Controller::join_links(
+		$this->gateway->returnURL = Director::absoluteURL(Controller::join_links(
 			$this->link(),
 			'complete',
 			$this->methodName,
 			$this->payment->ID
 		));
-		$this->gateway->setReturnURL($returnURL);
-		
 		
 		// Authorise the payment and get token 
     $result = $this->gateway->authorise($this->paymentData);

@@ -1,4 +1,6 @@
-# PayPal Payment
+# SilverStripe Payment PayPal Module
+
+**Work in progress, some changes to the API still to come**
 
 ## Maintainer Contacts
 * [Ryan Dao](https://github.com/ryandao)
@@ -6,19 +8,18 @@
 * [Jeremy Shipman](https://github.com/jedateach)
 
 ## Requirements
-* SilverStripe 3.*
-* SilverStripe Payment 1.*
+* SilverStripe 3.0.x
+* Payment module 1.0.x
 
 ## Documentation
-
-### Usage Overview
 This module provides PayPal Express Payment support for the SilverStripe Payment module. 
 
 ### Installation guide
 1. Place this directory in the root of your SilverStripe installation and call it 'payment-paypal'.
+2. Visit yoursite.com/dev/build?flush=1 to rebuild the database.
 
-2. Enable the PayPalExpress payment method in the payment YAML configuration file.  
-e.g: mysite/_config/Mysite.yaml
+### Usage Overview
+Enable in your application YAML config (e.g: mysite/_config/payment.yaml):
 
 ```yaml
 PaymentGateway:
@@ -32,9 +33,7 @@ PaymentProcessor:
     live:
       - 'PayPalExpress'
 ```
-
-3. Configure the PayPalExpress payment method with your PayPal API details in the payment YAML configuration file.  
-e.g mysite/_config/Mysite.yaml
+Configure using your PayPal API details in the same file:
 
 ```yaml
 PayPalGateway_Express: 
