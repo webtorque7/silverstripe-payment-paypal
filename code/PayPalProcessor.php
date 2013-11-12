@@ -1,70 +1,75 @@
 <?php
 
-class PayPalProcessor_Express extends PaymentProcessor {
+class PayPalProcessor_Express extends PaymentProcessor
+{
+        private static $allowed_actions = array(
+                'complete',
+                'cancel'
+        );
 
-	public function capture($data) {
+        public function capture($data) {
 
-		parent::capture($data);
-		
-		// Set the return link
-		$this->gateway->returnURL = Director::absoluteURL(Controller::join_links(
-			$this->link(),
-			'complete',
-			$this->methodName,
-			$this->payment->ID
-		));
-		
-		// Authorise the payment and get token 
-    $result = $this->gateway->authorise($this->paymentData);
-    
-    if ($result && !$result->isSuccess()) {
-			$this->payment->updateStatus($result);
-			$this->doRedirect();
-			return;
-		}
+                parent::capture($data);
 
-		// Save the token for good measure
-    $this->payment->Token = $this->gateway->tokenID;
-    $this->payment->write();
+                // Set the return link
+                $this->gateway->returnURL = Director::absoluteURL(Controller::join_links(
+                        $this->link(),
+                        'complete',
+                        $this->methodName,
+                        $this->payment->ID
+                ));
 
-		// Process payment
-		$result = $this->gateway->process($this->paymentData);
+                // Authorise the payment and get token
+                $result = $this->gateway->authorise($this->paymentData);
 
-		// Processing may not get to here if all goes smoothly, customer will be at the 3rd party gateway
-		if ($result && !$result->isSuccess()) {
-			$this->payment->updateStatus($result);
-			$this->doRedirect();
-			return;
-		}
-	}
+                if ($result && !$result->isSuccess()) {
+                        $this->payment->updateStatus($result);
+                        $this->doRedirect();
+                        return;
+                }
 
-	public function complete($request) {
+                // Save the token for good measure
+                $this->payment->Token = $this->gateway->tokenID;
+                $this->payment->write();
 
-		// Reconstruct the payment object
-		$this->payment = Payment::get()->byID($request->param('OtherID'));
-		
-		// Save the payer ID for good measure
-    $this->payment->PayerID = $request->getVar('PayerID');
-    $this->payment->write();
+                // Process payment
+                $result = $this->gateway->process($this->paymentData);
 
-		// Reconstruct the gateway object
-		$methodName = $request->param('ID');
-		$this->gateway = PaymentFactory::get_gateway($methodName);
+                // Processing may not get to here if all goes smoothly, customer will be at the 3rd party gateway
+                if ($result && !$result->isSuccess()) {
+                        $this->payment->updateStatus($result);
+                        $this->doRedirect();
+                        return;
+                }
+        }
 
-		// Confirm the payment
-		$data = array(
-			'PayerID' => $request->getVar('PayerID'),
-			'Token' => $request->getVar('token'),
-			'Amount' => $this->payment->Amount->Amount,
-			'Currency' => $this->payment->Amount->Currency
-		);
+        public function complete($request) {
 
-		$result = $this->gateway->confirm($data);
-		$this->payment->updateStatus($result);
+                // Reconstruct the payment object
+                $this->payment = Payment::get()->byID($request->param('OtherID'));
 
-		// Do redirection
-		$this->doRedirect();
-		return;
-	}
+                // Save the payer ID for good measure
+                $this->payment->PayerID = $request->getVar('PayerID');
+                $this->payment->write();
+
+                // Reconstruct the gateway object
+                $methodName = $request->param('ID');
+                $this->gateway = PaymentFactory::get_gateway($methodName);
+
+                // Confirm the payment
+                $data = array(
+                        'PayerID' => $request->getVar('PayerID'),
+                        'Token' => $request->getVar('token'),
+                        'Amount' => $this->payment->Amount->Amount,
+                        'Currency' => $this->payment->Amount->Currency
+                );
+
+                $result = $this->gateway->confirm($data);
+                $this->payment->updateStatus($result);
+
+                // Do redirection
+                $this->doRedirect();
+                return;
+        }
 
 }
